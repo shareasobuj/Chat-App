@@ -75,20 +75,20 @@
 
     // প্রোফাইল পরিবর্তন ফাংশন
     window.changeProfile = async () => {
-        const name = prompt("আপনার নাম লিখুন:");
-        if(!name) return;
-        const input = document.createElement('input');
-        input.type = 'file'; input.accept = 'image/*';
-        input.onchange = async (e) => {
-            const file = e.target.files[0];
-            const sRef = ref(storage, 'avatars/' + auth.currentUser.uid);
-            await uploadBytes(sRef, file);
-            const url = await getDownloadURL(sRef);
-            await setDoc(doc(db, "users", auth.currentUser.uid), { name, url });
-            location.reload();
-        };
-        input.click();
+    const name = prompt("আপনার নাম লিখুন:");
+    if(!name) return;
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = 'image/*';
+    input.onchange = async (e) => {
+        const file = e.target.files[0];
+        const sRef = ref(storage, 'avatars/' + auth.currentUser.uid);
+        await uploadBytes(sRef, file);
+        const url = await getDownloadURL(sRef);
+        await setDoc(doc(db, "users", auth.currentUser.uid), { name, url });
+        location.reload();
     };
+    input.click();
+};
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
