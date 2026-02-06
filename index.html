@@ -3,71 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat App</title>
+    <title>Chat App Pro</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: #dadbd3; display: flex; justify-content: center; height: 100vh; }
-
-        /* Auth Screen */
-        #auth-container { width: 100%; max-width: 400px; background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin: auto; text-align: center; }
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; outline: none; }
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        .login-btn { background: #075e54; color: white; }
-        .signup-btn { background: #128c7e; color: white; }
-
-        /* Main App Interface */
-        #app-container { display: none; width: 100%; max-width: 600px; height: 100vh; flex-direction: column; background: #e5ddd5; }
-        header { background: #075e54; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
-        #chat-window { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); }
-
-        /* Message Bubbles */
-        .msg { max-width: 80%; padding: 10px; border-radius: 10px; font-size: 14px; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .sent { background: #dcf8c6; align-self: flex-end; border-top-right-radius: 0; }
-        .received { background: white; align-self: flex-start; border-top-left-radius: 0; }
-        .msg img, .msg video { max-width: 100%; border-radius: 8px; margin-top: 5px; display: block; }
-        .msg audio { width: 100%; margin-top: 5px; }
-
-        /* Input Bar */
-        .input-bar { background: #f0f0f0; padding: 12px; display: flex; align-items: center; gap: 10px; }
-        #msgInput { flex: 1; padding: 12px; border: none; border-radius: 25px; outline: none; }
-        .media-label { cursor: pointer; font-size: 24px; color: #54656f; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+        body { background: #e5ddd5; }
+        #auth-container, #app-container { max-width: 500px; margin: auto; height: 100vh; display: flex; flex-direction: column; background: white; }
+        header { background: #075e54; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        #chat-window { flex: 1; overflow-y: auto; padding: 15px; background: #e5ddd5; display: flex; flex-direction: column; gap: 10px; }
+        .msg { max-width: 80%; padding: 8px 12px; border-radius: 8px; font-size: 14px; position: relative; line-height: 1.4; }
+        .sent { background: #dcf8c6; align-self: flex-end; }
+        .received { background: white; align-self: flex-start; }
+        .user-info { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: bold; color: #075e54; margin-bottom: 3px; }
+        .avatar { width: 25px; height: 25px; border-radius: 50%; object-fit: cover; }
+        .input-bar { background: #f0f0f0; padding: 10px; display: flex; gap: 10px; align-items: center; }
+        input[type="text"] { flex: 1; padding: 10px; border-radius: 20px; border: none; outline: none; }
         #mediaInput { display: none; }
-        .send-btn { background: #075e54; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-size: 20px; }
+        .msg img, .msg video { max-width: 100%; border-radius: 5px; margin-top: 5px; }
     </style>
 </head>
 <body>
 
 <div id="auth-container">
-    <h1 style="color:#075e54; margin-bottom:20px;">Chat App</h1>
-    <input type="email" id="email" placeholder="ইমেইল">
-    <input type="password" id="password" placeholder="পাসওয়ার্ড">
-    <button class="btn login-btn" onclick="login()">Login</button>
-    <button class="btn signup-btn" onclick="signUp()">Sign Up</button>
+    <div style="padding: 40px; text-align: center;">
+        <h2>Chat App Login</h2>
+        <input type="email" id="email" placeholder="ইমেইল" style="width:100%; padding:10px; margin:10px 0;">
+        <input type="password" id="password" placeholder="পাসওয়ার্ড" style="width:100%; padding:10px; margin:10px 0;">
+        <button onclick="login()" style="width:100%; padding:10px; background:#075e54; color:white; border:none;">Login</button>
+        <button onclick="signUp()" style="width:100%; padding:10px; margin-top:10px;">Sign Up</button>
+    </div>
 </div>
 
-<div id="app-container">
-    <header>
-        <span id="user-display">Chat App</span>
-        <button onclick="logout()" style="background:none; color:white; border:1px solid white; padding:5px; border-radius:5px; cursor:pointer;">Logout</button>
+<div id="app-container" style="display:none;">
+    <header onclick="changeProfile()">
+        <div style="display:flex; align-items:center; gap:10px;">
+            <img id="my-avatar" src="https://via.placeholder.com/40" style="width:40px; height:40px; border-radius:50%; background:white;">
+            <span id="my-name">Chat User</span>
+        </div>
+        <button onclick="logout()" style="background:none; border:1px solid white; color:white; padding:5px;">Logout</button>
     </header>
     <div id="chat-window"></div>
     <div class="input-bar">
-        <label for="mediaInput" class="media-label">📎</label>
+        <label for="mediaInput" style="cursor:pointer; font-size:20px;">📎</label>
         <input type="file" id="mediaInput" accept="image/*,video/*,audio/*">
         <input type="text" id="msgInput" placeholder="মেসেজ লিখুন...">
-        <button class="send-btn" onclick="sendMessage()">➤</button>
+        <button onclick="sendMessage()" style="padding: 10px 20px; border-radius: 20px; border:none; background:#075e54; color:white;">➤</button>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-    // ১. আপনার Firebase Config এখানে বসান
+    // ৩. আপনার নিজের Firebase Config এখানে বসান
     const firebaseConfig = {
-          apiKey: "AIzaSyCDl5ewD2Q-oxslT-lmlE2AiyUtgt0iX8A",
+        apiKey: "AIzaSyCDl5ewD2Q-oxslT-lmlE2AiyUtgt0iX8A",
   authDomain: "chat-app-51f1a.firebaseapp.com",
   databaseURL: "https://chat-app-51f1a-default-rtdb.firebaseio.com",
   projectId: "chat-app-51f1a",
@@ -81,27 +72,33 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
     const storage = getStorage(app);
-    const msgCol = collection(db, "messages");
 
-    window.signUp = () => {
-        const e = document.getElementById('email').value;
-        const p = document.getElementById('password').value;
-        createUserWithEmailAndPassword(auth, e, p).catch(err => alert(err.message));
+    // প্রোফাইল পরিবর্তন ফাংশন
+    window.changeProfile = async () => {
+        const name = prompt("আপনার নাম লিখুন:");
+        if(!name) return;
+        const input = document.createElement('input');
+        input.type = 'file'; input.accept = 'image/*';
+        input.onchange = async (e) => {
+            const file = e.target.files[0];
+            const sRef = ref(storage, 'avatars/' + auth.currentUser.uid);
+            await uploadBytes(sRef, file);
+            const url = await getDownloadURL(sRef);
+            await setDoc(doc(db, "users", auth.currentUser.uid), { name, url });
+            location.reload();
+        };
+        input.click();
     };
 
-    window.login = () => {
-        const e = document.getElementById('email').value;
-        const p = document.getElementById('password').value;
-        signInWithEmailAndPassword(auth, e, p).catch(err => alert(err.message));
-    };
-
-    window.logout = () => signOut(auth);
-
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
         if (user) {
             document.getElementById('auth-container').style.display = 'none';
             document.getElementById('app-container').style.display = 'flex';
-            document.getElementById('user-display').innerText = user.email.split('@')[0];
+            const uDoc = await getDoc(doc(db, "users", user.uid));
+            if(uDoc.exists()){
+                document.getElementById('my-name').innerText = uDoc.data().name;
+                document.getElementById('my-avatar').src = uDoc.data().url;
+            }
             loadMessages();
         } else {
             document.getElementById('auth-container').style.display = 'block';
@@ -109,40 +106,57 @@
         }
     });
 
+    window.login = () => signInWithEmailAndPassword(auth, email.value, password.value);
+    window.signUp = () => createUserWithEmailAndPassword(auth, email.value, password.value);
+    window.logout = () => signOut(auth);
+
     window.sendMessage = async () => {
-        const text = document.getElementById('msgInput').value;
-        if (text.trim() !== "") {
-            await addDoc(msgCol, { text, type: "text", sender: auth.currentUser.email, time: serverTimestamp() });
-            document.getElementById('msgInput').value = "";
+        const text = msgInput.value;
+        const uDoc = await getDoc(doc(db, "users", auth.currentUser.uid));
+        const userData = uDoc.exists() ? uDoc.data() : {name: auth.currentUser.email.split('@')[0], url: ''};
+        if (text.trim()) {
+            await addDoc(collection(db, "messages"), { 
+                text, type: "text", sender: auth.currentUser.email, 
+                senderName: userData.name, senderPic: userData.url,
+                time: serverTimestamp() 
+            });
+            msgInput.value = "";
         }
     };
 
     document.getElementById('mediaInput').onchange = async (e) => {
         const file = e.target.files[0];
-        if (!file) return;
-        const fileRef = ref(storage, 'uploads/' + Date.now() + "_" + file.name);
-        const snap = await uploadBytes(fileRef, file);
-        const url = await getDownloadURL(snap.ref);
-        let type = file.type.split('/')[0];
-        await addDoc(msgCol, { url, type, sender: auth.currentUser.email, time: serverTimestamp() });
+        const sRef = ref(storage, 'uploads/' + Date.now() + "_" + file.name);
+        await uploadBytes(sRef, file);
+        const url = await getDownloadURL(sRef);
+        const uDoc = await getDoc(doc(db, "users", auth.currentUser.uid));
+        const userData = uDoc.exists() ? uDoc.data() : {name: auth.currentUser.email.split('@')[0], url: ''};
+        await addDoc(collection(db, "messages"), { 
+            url, type: file.type.split('/')[0], sender: auth.currentUser.email,
+            senderName: userData.name, senderPic: userData.url,
+            time: serverTimestamp() 
+        });
     };
 
     function loadMessages() {
-        const q = query(msgCol, orderBy("time"));
-        onSnapshot(q, (snapshot) => {
+        const q = query(collection(db, "messages"), orderBy("time"));
+        onSnapshot(q, (snap) => {
             const win = document.getElementById('chat-window');
             win.innerHTML = "";
-            snapshot.docs.forEach(doc => {
-                const data = doc.data();
+            snap.docs.forEach(d => {
+                const data = d.data();
                 const isMe = data.sender === auth.currentUser.email;
                 const div = document.createElement('div');
-                div.classList.add('msg', isMe ? 'sent' : 'received');
-                let html = `<span style="font-size:10px; font-weight:bold; display:block;">${data.sender.split('@')[0]}</span>`;
-                if (data.type === "text") html += data.text;
-                else if (data.type === "image") html += `<img src="${data.url}">`;
-                else if (data.type === "video") html += `<video controls src="${data.url}"></video>`;
-                else if (data.type === "audio") html += `<audio controls src="${data.url}"></audio>`;
-                div.innerHTML = html;
+                div.className = `msg ${isMe ? 'sent' : 'received'}`;
+                let content = `<div class="user-info">
+                    <img class="avatar" src="${data.senderPic || 'https://via.placeholder.com/25'}">
+                    <span>${data.senderName}</span>
+                </div>`;
+                if(data.type === 'text') content += data.text;
+                else if(data.type === 'image') content += `<img src="${data.url}">`;
+                else if(data.type === 'video') content += `<video controls src="${data.url}"></video>`;
+                else if(data.type === 'audio') content += `<audio controls src="${data.url}"></audio>`;
+                div.innerHTML = content;
                 win.appendChild(div);
             });
             win.scrollTop = win.scrollHeight;
