@@ -1,64 +1,66 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat App Pro</title>
+    <title>WhatsApp Lite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
-        body { background: #e5ddd5; }
-        #auth-container, #app-container { max-width: 500px; margin: auto; height: 100vh; display: flex; flex-direction: column; background: white; }
-        header { background: #075e54; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        #chat-window { flex: 1; overflow-y: auto; padding: 15px; background: #e5ddd5; display: flex; flex-direction: column; gap: 10px; }
-        .msg { max-width: 80%; padding: 8px 12px; border-radius: 8px; font-size: 14px; position: relative; line-height: 1.4; }
-        .sent { background: #dcf8c6; align-self: flex-end; }
-        .received { background: white; align-self: flex-start; }
-        .user-info { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: bold; color: #075e54; margin-bottom: 3px; }
-        .avatar { width: 25px; height: 25px; border-radius: 50%; object-fit: cover; }
-        .input-bar { background: #f0f0f0; padding: 10px; display: flex; gap: 10px; align-items: center; }
-        input[type="text"] { flex: 1; padding: 10px; border-radius: 20px; border: none; outline: none; }
-        #mediaInput { display: none; }
-        .msg img, .msg video { max-width: 100%; border-radius: 5px; margin-top: 5px; }
+        body { background-color: #0b141a; color: #e9edef; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .chat-bg { background-color: #0b141a; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-blend-mode: overlay; opacity: 0.9; }
+        .my-msg { background-color: #005c4b; border-radius: 10px 0 10px 10px; color: white; }
+        .friend-msg { background-color: #202c33; border-radius: 0 10px 10px 10px; color: white; }
+        #menu-dropdown { display: none; transition: 0.2s; }
+        #menu-dropdown.show { display: block; }
+        input::placeholder { color: #8696a0; }
     </style>
 </head>
-<body>
+<body class="h-screen flex flex-col overflow-hidden">
 
-<div id="auth-container">
-    <div style="padding: 40px; text-align: center;">
-        <h2>Chat App Login</h2>
-        <input type="email" id="email" placeholder="ইমেইল" style="width:100%; padding:10px; margin:10px 0;">
-        <input type="password" id="password" placeholder="পাসওয়ার্ড" style="width:100%; padding:10px; margin:10px 0;">
-        <button onclick="login()" style="width:100%; padding:10px; background:#075e54; color:white; border:none;">Login</button>
-        <button onclick="signUp()" style="width:100%; padding:10px; margin-top:10px;">Sign Up</button>
-    </div>
-</div>
-
-<div id="app-container" style="display:none;">
-    <header onclick="changeProfile()">
-        <div style="display:flex; align-items:center; gap:10px;">
-            <img id="my-avatar" src="https://via.placeholder.com/40" style="width:40px; height:40px; border-radius:50%; background:white;">
-            <span id="my-name">Chat User</span>
+    <div class="bg-[#202c33] p-3 flex justify-between items-center shadow-md z-10">
+        <div class="flex items-center gap-3">
+            <img id="user-pic" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="w-10 h-10 rounded-full object-cover border border-gray-600">
+            <div>
+                <h1 id="user-name" class="font-bold text-md">My Chat</h1>
+                <p class="text-[11px] text-[#00a884]">online</p>
+            </div>
         </div>
-        <button onclick="logout()" style="background:none; border:1px solid white; color:white; padding:5px;">Logout</button>
-    </header>
-    <div id="chat-window"></div>
-    <div class="input-bar">
-        <label for="mediaInput" style="cursor:pointer; font-size:20px;">📎</label>
-        <input type="file" id="mediaInput" accept="image/*,video/*,audio/*">
-        <input type="text" id="msgInput" placeholder="মেসেজ লিখুন...">
-        <button onclick="sendMessage()" style="padding: 10px 20px; border-radius: 20px; border:none; background:#075e54; color:white;">➤</button>
+        <div class="flex gap-6 text-[#aebac1] text-lg">
+            <i class="fa-solid fa-camera cursor-pointer hover:text-white"></i>
+            <i class="fa-solid fa-magnifying-glass cursor-pointer hover:text-white"></i>
+            <div class="relative">
+                <i class="fa-solid fa-ellipsis-vertical cursor-pointer py-1 px-2 hover:bg-[#3b4a54] rounded-full" onclick="toggleMenu()"></i>
+                <div id="menu-dropdown" class="absolute right-0 mt-3 w-48 bg-[#233138] rounded shadow-xl z-50 py-2 border border-[#3b4a54]">
+                    <div class="px-4 py-2 hover:bg-[#182229] cursor-pointer" onclick="openSettings()">Profile Settings</div>
+                    <div class="px-4 py-2 hover:bg-[#182229] cursor-pointer" onclick="logout()">Logout</div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+    <div id="chat-box" class="flex-1 overflow-y-auto p-4 chat-bg space-y-4">
+        </div>
 
-    // ৩. আপনার নিজের Firebase Config এখানে বসান
-    const firebaseConfig = {
-        apiKey: "AIzaSyCDl5ewD2Q-oxslT-lmlE2AiyUtgt0iX8A",
+    <div class="bg-[#202c33] px-4 py-3 flex items-center gap-3">
+        <i class="fa-regular fa-face-smile text-2xl text-[#8696a0] cursor-pointer"></i>
+        <i class="fa-solid fa-plus text-xl text-[#8696a0] cursor-pointer"></i>
+        <input id="msg-input" type="text" placeholder="Type a message" class="flex-1 bg-[#2a3942] text-white px-4 py-2 rounded-lg outline-none focus:ring-1 ring-[#00a884]">
+        <button onclick="sendMsg()" class="bg-[#00a884] w-11 h-11 rounded-full flex items-center justify-center hover:bg-[#008f72] transition">
+            <i class="fa-solid fa-paper-plane text-white text-sm"></i>
+        </button>
+    </div>
+
+    <input type="file" id="file-input" accept="image/*" class="hidden">
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        // --- আপনার API কনফিগারেশন এখানে বসান ---
+        const firebaseConfig = {
+             apiKey: "AIzaSyCDl5ewD2Q-oxslT-lmlE2AiyUtgt0iX8A",
   authDomain: "chat-app-51f1a.firebaseapp.com",
   databaseURL: "https://chat-app-51f1a-default-rtdb.firebaseio.com",
   projectId: "chat-app-51f1a",
@@ -68,100 +70,79 @@
   measurementId: "G-HXW1L660ZF"
 };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
 
-    // প্রোফাইল পরিবর্তন ফাংশন
-    window.changeProfile = async () => {
-    const name = prompt("আপনার নাম লিখুন:");
-    if(!name) return;
-    const input = document.createElement('input');
-    input.type = 'file'; input.accept = 'image/*';
-    input.onchange = async (e) => {
-        const file = e.target.files[0];
-        const sRef = ref(storage, 'avatars/' + auth.currentUser.uid);
-        await uploadBytes(sRef, file);
-        const url = await getDownloadURL(sRef);
-        await setDoc(doc(db, "users", auth.currentUser.uid), { name, url });
-        location.reload();
-    };
-    input.click();
-};
+        // প্রোফাইল সেটিংস (গ্যালারি থেকে ছবিসহ)
+        window.openSettings = () => {
+            const name = prompt("আপনার নাম লিখুন:");
+            if (!name) return;
 
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            document.getElementById('auth-container').style.display = 'none';
-            document.getElementById('app-container').style.display = 'flex';
-            const uDoc = await getDoc(doc(db, "users", user.uid));
-            if(uDoc.exists()){
-                document.getElementById('my-name').innerText = uDoc.data().name;
-                document.getElementById('my-avatar').src = uDoc.data().url;
+            const fileInput = document.getElementById('file-input');
+            fileInput.onchange = (e) => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onloadend = async () => {
+                    const base64Image = reader.result; // ছবিকে টেক্সটে রূপান্তর
+                    await setDoc(doc(db, "users", auth.currentUser.uid), {
+                        name: name,
+                        url: base64Image
+                    });
+                    location.reload();
+                };
+                reader.readAsDataURL(file);
+            };
+            fileInput.click();
+        };
+
+        // বাকি কোড (লগইন, মেসেজ লোড, পাঠানো)
+        onAuthStateChanged(auth, (user) => {
+            if (user) { loadProfile(); loadMessages(); }
+        });
+
+        async function loadProfile() {
+            const userDoc = await getDoc(doc(db, "users", auth.currentUser.uid));
+            if (userDoc.exists()) {
+                document.getElementById('user-name').innerText = userDoc.data().name;
+                if(userDoc.data().url) document.getElementById('user-pic').src = userDoc.data().url;
             }
-            loadMessages();
-        } else {
-            document.getElementById('auth-container').style.display = 'block';
-            document.getElementById('app-container').style.display = 'none';
         }
-    });
 
-    window.login = () => signInWithEmailAndPassword(auth, email.value, password.value);
-    window.signUp = () => createUserWithEmailAndPassword(auth, email.value, password.value);
-    window.logout = () => signOut(auth);
-
-    window.sendMessage = async () => {
-        const text = msgInput.value;
-        const uDoc = await getDoc(doc(db, "users", auth.currentUser.uid));
-        const userData = uDoc.exists() ? uDoc.data() : {name: auth.currentUser.email.split('@')[0], url: ''};
-        if (text.trim()) {
-            await addDoc(collection(db, "messages"), { 
-                text, type: "text", sender: auth.currentUser.email, 
-                senderName: userData.name, senderPic: userData.url,
-                time: serverTimestamp() 
+        window.sendMsg = async () => {
+            const text = document.getElementById('msg-input').value;
+            if (!text) return;
+            const userDoc = await getDoc(doc(db, "users", auth.currentUser.uid));
+            await addDoc(collection(db, "messages"), {
+                text, sender: auth.currentUser.uid,
+                senderName: userDoc.exists() ? userDoc.data().name : "User",
+                time: Date.now()
             });
-            msgInput.value = "";
+            document.getElementById('msg-input').value = "";
+        };
+
+        function loadMessages() {
+            const q = query(collection(db, "messages"), orderBy("time", "asc"));
+            onSnapshot(q, (snapshot) => {
+                const chatBox = document.getElementById('chat-box');
+                chatBox.innerHTML = "";
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const isMe = data.sender === auth.currentUser.uid;
+                    chatBox.innerHTML += `
+                        <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
+                            <div class="${isMe ? 'my-msg' : 'friend-msg'} p-2 px-3 max-w-[75%] shadow">
+                                <p class="text-[10px] ${isMe ? 'text-green-300' : 'text-green-400'} font-bold">${data.senderName}</p>
+                                <p class="text-sm mt-1">${data.text}</p>
+                            </div>
+                        </div>`;
+                });
+                chatBox.scrollTop = chatBox.scrollHeight;
+            });
         }
-    };
 
-    document.getElementById('mediaInput').onchange = async (e) => {
-        const file = e.target.files[0];
-        const sRef = ref(storage, 'uploads/' + Date.now() + "_" + file.name);
-        await uploadBytes(sRef, file);
-        const url = await getDownloadURL(sRef);
-        const uDoc = await getDoc(doc(db, "users", auth.currentUser.uid));
-        const userData = uDoc.exists() ? uDoc.data() : {name: auth.currentUser.email.split('@')[0], url: ''};
-        await addDoc(collection(db, "messages"), { 
-            url, type: file.type.split('/')[0], sender: auth.currentUser.email,
-            senderName: userData.name, senderPic: userData.url,
-            time: serverTimestamp() 
-        });
-    };
-
-    function loadMessages() {
-        const q = query(collection(db, "messages"), orderBy("time"));
-        onSnapshot(q, (snap) => {
-            const win = document.getElementById('chat-window');
-            win.innerHTML = "";
-            snap.docs.forEach(d => {
-                const data = d.data();
-                const isMe = data.sender === auth.currentUser.email;
-                const div = document.createElement('div');
-                div.className = `msg ${isMe ? 'sent' : 'received'}`;
-                let content = `<div class="user-info">
-                    <img class="avatar" src="${data.senderPic || 'https://via.placeholder.com/25'}">
-                    <span>${data.senderName}</span>
-                </div>`;
-                if(data.type === 'text') content += data.text;
-                else if(data.type === 'image') content += `<img src="${data.url}">`;
-                else if(data.type === 'video') content += `<video controls src="${data.url}"></video>`;
-                else if(data.type === 'audio') content += `<audio controls src="${data.url}"></audio>`;
-                div.innerHTML = content;
-                win.appendChild(div);
-            });
-            win.scrollTop = win.scrollHeight;
-        });
-    }
-</script>
+        window.toggleMenu = () => document.getElementById('menu-dropdown').classList.toggle('show');
+        window.logout = () => signOut(auth).then(() => location.reload());
+    </script>
 </body>
 </html>
