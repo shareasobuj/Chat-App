@@ -1,73 +1,73 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat App</title>
+    <title>WhatsApp Personal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: #dadbd3; display: flex; justify-content: center; height: 100vh; }
-
-        /* Auth Screen */
-        #auth-container { width: 100%; max-width: 400px; background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin: auto; text-align: center; }
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; outline: none; }
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        .login-btn { background: #075e54; color: white; }
-        .signup-btn { background: #128c7e; color: white; }
-
-        /* Main App Interface */
-        #app-container { display: none; width: 100%; max-width: 600px; height: 100vh; flex-direction: column; background: #e5ddd5; }
-        header { background: #075e54; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
-        #chat-window { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); }
-
-        /* Message Bubbles */
-        .msg { max-width: 80%; padding: 10px; border-radius: 10px; font-size: 14px; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .sent { background: #dcf8c6; align-self: flex-end; border-top-right-radius: 0; }
-        .received { background: white; align-self: flex-start; border-top-left-radius: 0; }
-        .msg img, .msg video { max-width: 100%; border-radius: 8px; margin-top: 5px; display: block; }
-        .msg audio { width: 100%; margin-top: 5px; }
-
-        /* Input Bar */
-        .input-bar { background: #f0f0f0; padding: 12px; display: flex; align-items: center; gap: 10px; }
-        #msgInput { flex: 1; padding: 12px; border: none; border-radius: 25px; outline: none; }
-        .media-label { cursor: pointer; font-size: 24px; color: #54656f; }
-        #mediaInput { display: none; }
-        .send-btn { background: #075e54; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-size: 20px; }
+        body { background-color: #0b141a; color: #e9edef; font-family: sans-serif; }
+        .whatsapp-bg { background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-color: rgba(11, 20, 26, 0.95); background-blend-mode: overlay; }
+        .my-msg { background-color: #005c4b; border-radius: 10px 0 10px 10px; align-self: flex-end; }
+        .friend-msg { background-color: #202c33; border-radius: 0 10px 10px 10px; align-self: flex-start; }
+        #auth-page, #main-app, #chat-screen { display: none; }
+        .user-card:hover { background-color: #2a3942; }
     </style>
 </head>
-<body>
+<body class="h-screen flex flex-col overflow-hidden">
 
-<div id="auth-container">
-    <h1 style="color:#075e54; margin-bottom:20px;">Chat App</h1>
-    <input type="email" id="email" placeholder="ইমেইল">
-    <input type="password" id="password" placeholder="পাসওয়ার্ড">
-    <button class="btn login-btn" onclick="login()">Login</button>
-    <button class="btn signup-btn" onclick="signUp()">Sign Up</button>
-</div>
-
-<div id="app-container">
-    <header>
-        <span id="user-display">Chat App</span>
-        <button onclick="logout()" style="background:none; color:white; border:1px solid white; padding:5px; border-radius:5px; cursor:pointer;">Logout</button>
-    </header>
-    <div id="chat-window"></div>
-    <div class="input-bar">
-        <label for="mediaInput" class="media-label">📎</label>
-        <input type="file" id="mediaInput" accept="image/*,video/*,audio/*">
-        <input type="text" id="msgInput" placeholder="মেসেজ লিখুন...">
-        <button class="send-btn" onclick="sendMessage()">➤</button>
+    <div id="auth-page" class="flex-1 flex flex-col justify-center items-center p-6">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" class="w-20 mb-8">
+        <input id="email" type="email" placeholder="Email" class="w-full max-w-sm p-3 rounded bg-[#2a3942] mb-3 outline-none">
+        <input id="pass" type="password" placeholder="Password" class="w-full max-w-sm p-3 rounded bg-[#2a3942] mb-6 outline-none">
+        <div class="flex gap-4">
+            <button onclick="authAction('login')" class="bg-[#00a884] px-8 py-2 rounded-full font-bold">Login</button>
+            <button onclick="authAction('signup')" class="border border-[#00a884] px-8 py-2 rounded-full font-bold">Sign Up</button>
+        </div>
     </div>
-</div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+    <div id="main-app" class="flex-1 flex flex-col overflow-hidden">
+        <header class="bg-[#202c33] p-4 flex justify-between items-center shadow-md">
+            <h1 class="text-xl font-bold text-white">WhatsApp</h1>
+            <div class="flex gap-4 items-center">
+                <i class="fa-solid fa-ellipsis-vertical cursor-pointer" onclick="toggleMenu('main-menu')"></i>
+                <div id="main-menu" class="hidden absolute right-4 top-14 bg-[#233138] py-2 w-40 shadow-xl z-50">
+                    <div class="px-4 py-2 hover:bg-[#182229] cursor-pointer" onclick="openProfileSettings()">Profile</div>
+                    <div class="px-4 py-2 hover:bg-[#182229] cursor-pointer" onclick="auth.signOut()">Logout</div>
+                </div>
+            </div>
+        </header>
+        <div id="user-list" class="flex-1 overflow-y-auto p-2">
+            <p class="text-gray-500 text-center mt-10">ইউজারদের তালিকা লোড হচ্ছে...</p>
+        </div>
+    </div>
 
-    // ১. আপনার Firebase Config এখানে বসান
-    const firebaseConfig = {
-        apiKey: "AIzaSyCDl5ewD2Q-oxslT-lmlE2AiyUtgt0iX8A",
+    <div id="chat-screen" class="absolute inset-0 bg-[#0b141a] flex flex-col z-40">
+        <header class="bg-[#202c33] p-3 flex items-center gap-3 shadow-md">
+            <i class="fa-solid fa-arrow-left cursor-pointer p-2" onclick="closeChat()"></i>
+            <img id="chat-user-pic" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="w-10 h-10 rounded-full object-cover">
+            <h2 id="chat-user-name" class="font-bold">Username</h2>
+        </header>
+        <div id="message-box" class="flex-1 overflow-y-auto p-4 whatsapp-bg flex flex-col gap-2"></div>
+        <footer class="bg-[#202c33] p-3 flex items-center gap-2">
+            <input id="chat-input" type="text" placeholder="Type a message" class="flex-1 bg-[#2a3942] p-2 rounded-full px-4 outline-none">
+            <button onclick="sendMessage()" class="bg-[#00a884] w-12 h-12 rounded-full flex items-center justify-center">
+                <i class="fa-solid fa-paper-plane text-white"></i>
+            </button>
+        </footer>
+    </div>
+
+    <input type="file" id="pic-picker" class="hidden">
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, getDoc, setDoc, where, or, and } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        // 🔥 আপনার API কনফিগারেশন এখানে বসান
+        const firebaseConfig = {
+              apiKey: "AIzaSyCDl5ewD2Q-oxslT-lmlE2AiyUtgt0iX8A",
   authDomain: "chat-app-51f1a.firebaseapp.com",
   databaseURL: "https://chat-app-51f1a-default-rtdb.firebaseio.com",
   projectId: "chat-app-51f1a",
@@ -77,77 +77,122 @@
   measurementId: "G-HXW1L660ZF"
 };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
-    const msgCol = collection(db, "messages");
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
 
-    window.signUp = () => {
-        const e = document.getElementById('email').value;
-        const p = document.getElementById('password').value;
-        createUserWithEmailAndPassword(auth, e, p).catch(err => alert(err.message));
-    };
+        let selectedUserId = null;
+        let unsubscribeMessages = null;
 
-    window.login = () => {
-        const e = document.getElementById('email').value;
-        const p = document.getElementById('password').value;
-        signInWithEmailAndPassword(auth, e, p).catch(err => alert(err.message));
-    };
+        // অথ লজিক
+        window.authAction = (type) => {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('pass').value;
+            if(type === 'login') signInWithEmailAndPassword(auth, email, pass);
+            else createUserWithEmailAndPassword(auth, email, pass);
+        };
 
-    window.logout = () => signOut(auth);
-
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            document.getElementById('auth-container').style.display = 'none';
-            document.getElementById('app-container').style.display = 'flex';
-            document.getElementById('user-display').innerText = user.email.split('@')[0];
-            loadMessages();
-        } else {
-            document.getElementById('auth-container').style.display = 'block';
-            document.getElementById('app-container').style.display = 'none';
-        }
-    });
-
-    window.sendMessage = async () => {
-        const text = document.getElementById('msgInput').value;
-        if (text.trim() !== "") {
-            await addDoc(msgCol, { text, type: "text", sender: auth.currentUser.email, time: serverTimestamp() });
-            document.getElementById('msgInput').value = "";
-        }
-    };
-
-    document.getElementById('mediaInput').onchange = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const fileRef = ref(storage, 'uploads/' + Date.now() + "_" + file.name);
-        const snap = await uploadBytes(fileRef, file);
-        const url = await getDownloadURL(snap.ref);
-        let type = file.type.split('/')[0];
-        await addDoc(msgCol, { url, type, sender: auth.currentUser.email, time: serverTimestamp() });
-    };
-
-    function loadMessages() {
-        const q = query(msgCol, orderBy("time"));
-        onSnapshot(q, (snapshot) => {
-            const win = document.getElementById('chat-window');
-            win.innerHTML = "";
-            snapshot.docs.forEach(doc => {
-                const data = doc.data();
-                const isMe = data.sender === auth.currentUser.email;
-                const div = document.createElement('div');
-                div.classList.add('msg', isMe ? 'sent' : 'received');
-                let html = `<span style="font-size:10px; font-weight:bold; display:block;">${data.sender.split('@')[0]}</span>`;
-                if (data.type === "text") html += data.text;
-                else if (data.type === "image") html += `<img src="${data.url}">`;
-                else if (data.type === "video") html += `<video controls src="${data.url}"></video>`;
-                else if (data.type === "audio") html += `<audio controls src="${data.url}"></audio>`;
-                div.innerHTML = html;
-                win.appendChild(div);
-            });
-            win.scrollTop = win.scrollHeight;
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                document.getElementById('auth-page').style.display = 'none';
+                document.getElementById('main-app').style.display = 'flex';
+                loadUserList();
+            } else {
+                document.getElementById('auth-page').style.display = 'flex';
+                document.getElementById('main-app').style.display = 'none';
+            }
         });
-    }
-</script>
+
+        // কন্টাক্ট লিস্ট লোড করা
+        function loadUserList() {
+            onSnapshot(collection(db, "users"), (snapshot) => {
+                const list = document.getElementById('user-list');
+                list.innerHTML = "";
+                snapshot.forEach(u => {
+                    if (u.id !== auth.currentUser.uid) {
+                        const data = u.data();
+                        list.innerHTML += `
+                            <div class="user-card flex items-center gap-4 p-4 border-b border-[#233138] cursor-pointer transition" onclick="openChat('${u.id}', '${data.name}', '${data.url || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}')">
+                                <img src="${data.url || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" class="w-12 h-12 rounded-full object-cover">
+                                <div><p class="font-bold">${data.name || 'User'}</p><p class="text-xs text-gray-500">Tap to chat</p></div>
+                            </div>`;
+                    }
+                });
+            });
+        }
+
+        // চ্যাট বক্স খোলা
+        window.openChat = (uid, name, pic) => {
+            selectedUserId = uid;
+            document.getElementById('chat-screen').style.display = 'flex';
+            document.getElementById('chat-user-name').innerText = name;
+            document.getElementById('chat-user-pic').src = pic;
+            listenMessages(uid);
+        };
+
+        window.closeChat = () => {
+            document.getElementById('chat-screen').style.display = 'none';
+            if(unsubscribeMessages) unsubscribeMessages();
+        };
+
+        // পার্সোনাল মেসেজ লজিক (Private Chat Query)
+        function listenMessages(friendId) {
+            const myId = auth.currentUser.uid;
+            // এই কোয়েরিটি শুধু আপনাদের দুজনের মেসেজ নিয়ে আসবে
+            const q = query(
+                collection(db, "messages"),
+                orderBy("time", "asc")
+            );
+
+            if(unsubscribeMessages) unsubscribeMessages();
+            
+            unsubscribeMessages = onSnapshot(q, (snapshot) => {
+                const box = document.getElementById('message-box');
+                box.innerHTML = "";
+                snapshot.forEach(d => {
+                    const data = d.data();
+                    // চেক করা হচ্ছে মেসেজটি কি আপনাদের দুজনের মধ্যে?
+                    if ((data.sender === myId && data.receiver === friendId) || (data.sender === friendId && data.receiver === myId)) {
+                        const isMe = data.sender === myId;
+                        box.innerHTML += `
+                            <div class="${isMe ? 'my-msg' : 'friend-msg'} p-2 px-3 max-w-[80%] shadow-sm">
+                                <p class="text-sm">${data.text}</p>
+                            </div>`;
+                    }
+                });
+                box.scrollTop = box.scrollHeight;
+            });
+        }
+
+        window.sendMessage = async () => {
+            const input = document.getElementById('chat-input');
+            const text = input.value;
+            if (!text || !selectedUserId) return;
+            
+            await addDoc(collection(db, "messages"), {
+                text,
+                sender: auth.currentUser.uid,
+                receiver: selectedUserId,
+                time: Date.now()
+            });
+            input.value = "";
+        };
+
+        window.toggleMenu = (id) => document.getElementById(id).classList.toggle('hidden');
+
+        window.openProfileSettings = () => {
+            const name = prompt("Enter Name:");
+            const picker = document.getElementById('pic-picker');
+            picker.onchange = (e) => {
+                const reader = new FileReader();
+                reader.onloadend = async () => {
+                    await setDoc(doc(db, "users", auth.currentUser.uid), { name, url: reader.result });
+                    alert("Profile Updated!");
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            };
+            picker.click();
+        };
+    </script>
 </body>
 </html>
