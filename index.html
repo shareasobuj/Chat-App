@@ -3,64 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Lite</title>
+    <title>WhatsApp Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #0b141a; color: #e9edef; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .chat-bg { background-color: #0b141a; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-blend-mode: overlay; opacity: 0.9; }
-        .my-msg { background-color: #005c4b; border-radius: 10px 0 10px 10px; color: white; }
-        .friend-msg { background-color: #202c33; border-radius: 0 10px 10px 10px; color: white; }
-        #menu-dropdown { display: none; transition: 0.2s; }
-        #menu-dropdown.show { display: block; }
+        body { background-color: #0b141a; color: #e9edef; font-family: 'Segoe UI', sans-serif; }
+        .whatsapp-bg { 
+            background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); 
+            background-color: rgba(11, 20, 26, 0.93); 
+            background-blend-mode: overlay; 
+        }
+        .my-msg { background-color: #005c4b; border-radius: 10px 0 10px 10px; align-self: flex-end; }
+        .friend-msg { background-color: #202c33; border-radius: 0 10px 10px 10px; align-self: flex-start; }
+        #auth-page, #chat-page { display: none; }
         input::placeholder { color: #8696a0; }
     </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden">
 
-    <div class="bg-[#202c33] p-3 flex justify-between items-center shadow-md z-10">
-        <div class="flex items-center gap-3">
-            <img id="user-pic" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="w-10 h-10 rounded-full object-cover border border-gray-600">
-            <div>
-                <h1 id="user-name" class="font-bold text-md">My Chat</h1>
-                <p class="text-[11px] text-[#00a884]">online</p>
+    <div id="auth-page" class="flex-1 flex flex-col justify-center items-center p-8">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" class="w-20 mb-10">
+        <h1 class="text-2xl font-bold mb-8">WhatsApp Lite</h1>
+        <div class="w-full max-w-md space-y-4">
+            <input id="email" type="email" placeholder="ইমেইল দিন" class="w-full p-4 rounded-lg bg-[#2a3942] outline-none focus:ring-2 ring-[#00a884]">
+            <input id="pass" type="password" placeholder="পাসওয়ার্ড দিন" class="w-full p-4 rounded-lg bg-[#2a3942] outline-none focus:ring-2 ring-[#00a884]">
+            <div class="flex gap-4 pt-4">
+                <button onclick="authAction('login')" class="flex-1 bg-[#00a884] py-3 rounded-full font-bold hover:bg-[#008f72] transition">Login</button>
+                <button onclick="authAction('signup')" class="flex-1 border border-[#00a884] py-3 rounded-full font-bold hover:bg-[#00a884]/10 transition">Sign Up</button>
             </div>
         </div>
-        <div class="flex gap-6 text-[#aebac1] text-lg">
-            <i class="fa-solid fa-camera cursor-pointer hover:text-white"></i>
-            <i class="fa-solid fa-magnifying-glass cursor-pointer hover:text-white"></i>
-            <div class="relative">
-                <i class="fa-solid fa-ellipsis-vertical cursor-pointer py-1 px-2 hover:bg-[#3b4a54] rounded-full" onclick="toggleMenu()"></i>
-                <div id="menu-dropdown" class="absolute right-0 mt-3 w-48 bg-[#233138] rounded shadow-xl z-50 py-2 border border-[#3b4a54]">
-                    <div class="px-4 py-2 hover:bg-[#182229] cursor-pointer" onclick="openSettings()">Profile Settings</div>
-                    <div class="px-4 py-2 hover:bg-[#182229] cursor-pointer" onclick="logout()">Logout</div>
+    </div>
+
+    <div id="chat-page" class="flex-1 flex flex-col overflow-hidden">
+        <header class="bg-[#202c33] p-3 flex justify-between items-center shadow-md">
+            <div class="flex items-center gap-3">
+                <img id="user-avatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="w-10 h-10 rounded-full object-cover border border-gray-600">
+                <div>
+                    <h2 id="user-display-name" class="font-bold text-md italic">User</h2>
+                    <p class="text-[10px] text-[#00a884]">online</p>
                 </div>
             </div>
-        </div>
+            <div class="flex gap-5 text-[#aebac1] text-lg">
+                <i class="fa-solid fa-video cursor-pointer"></i>
+                <i class="fa-solid fa-phone cursor-pointer"></i>
+                <div class="relative">
+                    <i class="fa-solid fa-ellipsis-vertical cursor-pointer px-2" onclick="document.getElementById('dropdown').classList.toggle('hidden')"></i>
+                    <div id="dropdown" class="hidden absolute right-0 mt-3 w-48 bg-[#233138] rounded-md shadow-2xl z-50 py-2 border border-[#3b4a54]">
+                        <div class="px-4 py-2 hover:bg-[#182229] cursor-pointer" onclick="openProfileSettings()">Profile Settings</div>
+                        <div class="px-4 py-2 hover:bg-[#182229] cursor-pointer" onclick="signOutUser()">Logout</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main id="message-container" class="flex-1 overflow-y-auto p-4 whatsapp-bg flex flex-col gap-3"></main>
+
+        <footer class="bg-[#202c33] p-3 flex items-center gap-2">
+            <div class="flex-1 bg-[#2a3942] flex items-center px-4 py-1 rounded-full">
+                <i class="fa-regular fa-face-smile text-2xl text-[#8696a0] mr-2"></i>
+                <input id="chat-input" type="text" placeholder="Type a message" class="w-full bg-transparent py-2 outline-none text-white">
+                <i class="fa-solid fa-paperclip text-[#8696a0] text-lg rotate-45 ml-2"></i>
+            </div>
+            <button onclick="sendMessage()" class="bg-[#00a884] w-12 h-12 rounded-full flex items-center justify-center shadow-lg active:scale-90 transition">
+                <i class="fa-solid fa-paper-plane text-white text-lg"></i>
+            </button>
+        </footer>
     </div>
 
-    <div id="chat-box" class="flex-1 overflow-y-auto p-4 chat-bg space-y-4">
-        </div>
-
-    <div class="bg-[#202c33] px-4 py-3 flex items-center gap-3">
-        <i class="fa-regular fa-face-smile text-2xl text-[#8696a0] cursor-pointer"></i>
-        <i class="fa-solid fa-plus text-xl text-[#8696a0] cursor-pointer"></i>
-        <input id="msg-input" type="text" placeholder="Type a message" class="flex-1 bg-[#2a3942] text-white px-4 py-2 rounded-lg outline-none focus:ring-1 ring-[#00a884]">
-        <button onclick="sendMsg()" class="bg-[#00a884] w-11 h-11 rounded-full flex items-center justify-center hover:bg-[#008f72] transition">
-            <i class="fa-solid fa-paper-plane text-white text-sm"></i>
-        </button>
-    </div>
-
-    <input type="file" id="file-input" accept="image/*" class="hidden">
+    <input type="file" id="image-picker" class="hidden" accept="image/*">
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // --- আপনার API কনফিগারেশন এখানে বসান ---
+        // 🔥 আপনার API কনফিগারেশন এখানে সাবধানে বসান
         const firebaseConfig = {
-             apiKey: "AIzaSyCDl5ewD2Q-oxslT-lmlE2AiyUtgt0iX8A",
+            apiKey: "AIzaSyCDl5ewD2Q-oxslT-lmlE2AiyUtgt0iX8A",
   authDomain: "chat-app-51f1a.firebaseapp.com",
   databaseURL: "https://chat-app-51f1a-default-rtdb.firebaseio.com",
   projectId: "chat-app-51f1a",
@@ -74,75 +93,91 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // প্রোফাইল সেটিংস (গ্যালারি থেকে ছবিসহ)
-        window.openSettings = () => {
-            const name = prompt("আপনার নাম লিখুন:");
-            if (!name) return;
-
-            const fileInput = document.getElementById('file-input');
-            fileInput.onchange = (e) => {
-                const file = e.target.files[0];
-                const reader = new FileReader();
-                reader.onloadend = async () => {
-                    const base64Image = reader.result; // ছবিকে টেক্সটে রূপান্তর
-                    await setDoc(doc(db, "users", auth.currentUser.uid), {
-                        name: name,
-                        url: base64Image
-                    });
-                    location.reload();
-                };
-                reader.readAsDataURL(file);
-            };
-            fileInput.click();
+        // লগইন ও সাইনআপ সিস্টেম
+        window.authAction = (type) => {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('pass').value;
+            if(!email || !password) return alert("ইমেইল ও পাসওয়ার্ড দিন!");
+            
+            if(type === 'login') {
+                signInWithEmailAndPassword(auth, email, password).catch(err => alert("লগইন ব্যর্থ: " + err.message));
+            } else {
+                createUserWithEmailAndPassword(auth, email, password).catch(err => alert("সাইনআপ ব্যর্থ: " + err.message));
+            }
         };
 
-        // বাকি কোড (লগইন, মেসেজ লোড, পাঠানো)
-        onAuthStateChanged(auth, (user) => {
-            if (user) { loadProfile(); loadMessages(); }
+        // ইউজারের অবস্থা পরীক্ষা
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                document.getElementById('auth-page').style.display = 'none';
+                document.getElementById('chat-page').style.display = 'flex';
+                loadUserData();
+                listenMessages();
+            } else {
+                document.getElementById('auth-page').style.display = 'flex';
+                document.getElementById('chat-page').style.display = 'none';
+            }
         });
 
-        async function loadProfile() {
-            const userDoc = await getDoc(doc(db, "users", auth.currentUser.uid));
-            if (userDoc.exists()) {
-                document.getElementById('user-name').innerText = userDoc.data().name;
-                if(userDoc.data().url) document.getElementById('user-pic').src = userDoc.data().url;
+        // প্রোফাইল সেটআপ (গ্যালারি থেকে ছবিসহ)
+        window.openProfileSettings = () => {
+            const name = prompt("আপনার নাম লিখুন:");
+            if (!name) return;
+            const picker = document.getElementById('image-picker');
+            picker.onchange = (e) => {
+                const reader = new FileReader();
+                reader.onloadend = async () => {
+                    await setDoc(doc(db, "users", auth.currentUser.uid), { name, url: reader.result });
+                    location.reload();
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            };
+            picker.click();
+        };
+
+        async function loadUserData() {
+            const snap = await getDoc(doc(db, "users", auth.currentUser.uid));
+            if (snap.exists()) {
+                document.getElementById('user-display-name').innerText = snap.data().name;
+                if(snap.data().url) document.getElementById('user-avatar').src = snap.data().url;
             }
         }
 
-        window.sendMsg = async () => {
-            const text = document.getElementById('msg-input').value;
+        // মেসেজ পাঠানো
+        window.sendMessage = async () => {
+            const text = document.getElementById('chat-input').value;
             if (!text) return;
-            const userDoc = await getDoc(doc(db, "users", auth.currentUser.uid));
+            const snap = await getDoc(doc(db, "users", auth.currentUser.uid));
             await addDoc(collection(db, "messages"), {
-                text, sender: auth.currentUser.uid,
-                senderName: userDoc.exists() ? userDoc.data().name : "User",
+                text, uid: auth.currentUser.uid,
+                name: snap.exists() ? snap.data().name : "User",
                 time: Date.now()
             });
-            document.getElementById('msg-input').value = "";
+            document.getElementById('chat-input').value = "";
         };
 
-        function loadMessages() {
+        // মেসেজ লোড করা
+        function listenMessages() {
             const q = query(collection(db, "messages"), orderBy("time", "asc"));
             onSnapshot(q, (snapshot) => {
-                const chatBox = document.getElementById('chat-box');
-                chatBox.innerHTML = "";
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const isMe = data.sender === auth.currentUser.uid;
-                    chatBox.innerHTML += `
+                const container = document.getElementById('message-container');
+                container.innerHTML = "";
+                snapshot.forEach(d => {
+                    const data = d.data();
+                    const isMe = data.uid === auth.currentUser.uid;
+                    container.innerHTML += `
                         <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
-                            <div class="${isMe ? 'my-msg' : 'friend-msg'} p-2 px-3 max-w-[75%] shadow">
-                                <p class="text-[10px] ${isMe ? 'text-green-300' : 'text-green-400'} font-bold">${data.senderName}</p>
+                            <div class="${isMe ? 'my-msg' : 'friend-msg'} p-2 px-3 max-w-[80%] shadow-md">
+                                <p class="text-[10px] font-bold ${isMe ? 'text-green-300' : 'text-green-500'}">${data.name}</p>
                                 <p class="text-sm mt-1">${data.text}</p>
                             </div>
                         </div>`;
                 });
-                chatBox.scrollTop = chatBox.scrollHeight;
+                container.scrollTop = container.scrollHeight;
             });
         }
 
-        window.toggleMenu = () => document.getElementById('menu-dropdown').classList.toggle('show');
-        window.logout = () => signOut(auth).then(() => location.reload());
+        window.signOutUser = () => signOut(auth);
     </script>
 </body>
 </html>
