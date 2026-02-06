@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Original WhatsApp Clone</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #dadbd3; }
+        
+        .app-container { max-width: 500px; margin: 0 auto; height: 100vh; display: flex; flex-direction: column; background: #e5ddd5; box-shadow: 0 0 15px rgba(0,0,0,0.2); }
+        
+        header { background: #075e54; color: white; padding: 15px; font-weight: bold; display: flex; align-items: center; gap: 10px; z-index: 10; }
+        
+        #chat-window { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); }
+
+        .msg { max-width: 80%; padding: 8px 12px; border-radius: 8px; font-size: 14px; position: relative; box-shadow: 0 1px 1px rgba(0,0,0,0.1); word-wrap: break-word; }
+        .sent { background: #dcf8c6; align-self: flex-end; border-top-right-radius: 0; }
+        .received { background: white; align-self: flex-start; border-top-left-radius: 0; }
+        
+        .msg img { max-width: 100%; border-radius: 5px; margin-top: 5px; display: block; }
+
+        .input-bar { background: #f0f0f0; padding: 10px; display: flex; align-items: center; gap: 10px; }
+        .input-bar input[type="text"] { flex: 1; padding: 12px; border-radius: 25px; border: none; outline: none; }
+        
+        .icon-btn { cursor: pointer; font-size: 20px; color: #51585c; }
+        .send-btn { background: #075e54; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-size: 20px; }
+        
+        #imageInput { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <div style="width: 35px; height: 35px; background: #fff; border-radius: 50%;"></div>
+        <span>GitHub Live Messenger</span>
+    </header>
+
+    <div id="chat-window"></div>
+
+    <div class="input-bar">
+        <label for="imageInput" class="icon-btn">📷</label>
+        <input type="file" id="imageInput" accept="image/*">
+        
+        <input type="text" id="msgInput" placeholder="মেসেজ লিখুন...">
+        <button class="send-btn" id="sendBtn">➤</button>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+    // ১. আপনার নিজের Firebase Config এখানে বসান
+    const firebaseConfig = {
+          apiKey: "AIzaSyCDl5ewD2Q-oxslT-lmlE2AiyUtgt0iX8A",
+  authDomain: "chat-app-51f1a.firebaseapp.com",
+  databaseURL: "https://chat-app-51f1a-default-rtdb.firebaseio.com",
+  projectId: "chat-app-51f1a",
+  storageBucket: "chat-app-51f1a.firebasestorage.app",
+  messagingSenderId: "714987169605",
+  appId: "1:714987169605:web:26bf3586f9da2b6d52402c",
+  measurementId: "G-HXW1L660ZF"
+};
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+    const msgCol = collection(db, "messages");
+
+    const chatWindow = document.getElementById('chat-window');
+    const msgInput = document.getElementById('msgInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const imageInput = document.getElementById('imageInput');
+
+    // ২. টেক্সট মেসেজ পাঠানো
+    sendBtn.onclick = async () => {
+        const text = msgInput.value.trim();
+        if (text !== "") {
+            await addDoc(msgCol, {
+                text: text,
+                type: "text",
+                sender: "Me",
+                time: serverTimestamp()
+            });
+            msgInput.value = "";
+        }
+    };
+
+    // ৩. ছবি পাঠানো
+    imageInput.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const storageRef = ref(storage, 'chats/' + Date.now() + "_" + file.name);
+            const snapshot = await uploadBytes(storageRef, file);
+            const url = await getDownloadURL(snapshot.ref);
+            
+            await addDoc(msgCol, {
+                imageUrl: url,
+                type: "image",
+                sender: "Me",
+                time: serverTimestamp()
+            });
+        }
+    };
+
+    // ৪. রিয়েল-টাইমে ডাটা রিড করা
+    const q = query(msgCol, orderBy("time"));
+    onSnapshot(q, (snapshot) => {
+        chatWindow.innerHTML = "";
+        snapshot.docs.forEach(doc => {
+            const data = doc.data();
+            const div = document.createElement('div');
+            div.classList.add('msg', data.sender === "Me" ? 'sent' : 'received');
+            
+            if (data.type === "text") {
+                div.innerText = data.text;
+            } else if (data.type === "image") {
+                div.innerHTML = `<img src="${data.imageUrl}" alt="image">`;
+            }
+            
+            chatWindow.appendChild(div);
+        });
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    });
+</script>
+
+</body>
+</html>
