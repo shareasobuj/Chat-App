@@ -131,11 +131,7 @@
     });
     input.value = "";
 };
-// এই লাইনটি আপনার জাভাস্ক্রিপ্ট লুপের ভেতর খুঁজুন এবং নিচের মতো করে লিখুন
-b.innerHTML += `<div class="msg-style"> 
-    ${content} 
-    <span style="cursor:pointer; margin-left:10px; opacity:0.6;" onclick="confirm('Delete?') && import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js').then(m=>m.deleteDoc(m.doc(db,'messages','${m.id}')))">🗑️</span>
-</div>`;
+
     document.getElementById('mediaInput').onchange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
