@@ -76,8 +76,7 @@
   appId: "1:714987169605:web:26bf3586f9da2b6d52402c",
   measurementId: "G-HXW1L660ZF"
 };
-        
-
+    
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
@@ -110,7 +109,13 @@
         }
     });
 
-    window.sendMsg = async (type='text', data=null) => {
+    window.sendMessage = async () => {
+        const text = document.getElementById('msgInput').value;
+        if (text.trim() !== "") {
+            await addDoc(msgCol, { text, type: "text", sender: auth.currentUser.email, time: serverTimestamp() });
+            document.getElementById('msgInput').value = "";
+        }
+    };window.sendMsg = async (type='text', data=null) => {
     const input = document.getElementById('m-input'); // আপনার ইনপুট বক্সের আইডি
     const msg = data || input.value;
 
@@ -137,7 +142,24 @@
         await addDoc(msgCol, { url, type, sender: auth.currentUser.email, time: serverTimestamp() });
     };
 
-    // onSnapshot এর ভেতর এই অংশটি খুঁজুন
+    function loadMessages() {
+        const q = query(msgCol, orderBy("time"));
+        onSnapshot(q, (snapshot) => {
+            const win = document.getElementById('chat-window');
+            win.innerHTML = "";
+            snapshot.docs.forEach(doc => {
+                const data = doc.data();
+                const isMe = data.sender === auth.currentUser.email;
+                const div = document.createElement('div');
+                div.classList.add('msg', isMe ? 'sent' : 'received');
+                let html = `<span style="font-size:10px; font-weight:bold; display:block;">${data.sender.split('@')[0]}</span>`;
+                if (data.type === "text") html += data.text;
+                else if (data.type === "image") html += `<img src="${data.url}">`;
+                else if (data.type === "video") html += `<video controls src="${data.url}"></video>`;
+                else if (data.type === "audio") html += `<audio controls src="${data.url}"></audio>`;
+                div.innerHTML = html;
+                win.appendChild(div);
+            });// onSnapshot এর ভেতর এই অংশটি খুঁজুন
 s.forEach(m => {
     const d = m.data();
     
@@ -149,7 +171,8 @@ s.forEach(m => {
         const isMe = d.f === auth.currentUser.uid;
         // ... আপনার আগের মেসেজ ডিজাইন কোড ...
     }
-});            win.scrollTop = win.scrollHeight;
+});
+            win.scrollTop = win.scrollHeight;
         });
     }
 </script>
