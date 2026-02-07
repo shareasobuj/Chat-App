@@ -116,29 +116,7 @@
             document.getElementById('msgInput').value = "";
         }
     };
-    // এই ফাংশনটি আপনার কোডের প্রোফাইল সেকশনে আপডেট করুন
-window.openProfile = () => {
-    const name = prompt("আপনার নাম লিখুন:");
-    if (!name) return;
-    
-    const picker = document.getElementById('pic-upload');
-    picker.onchange = (e) => {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        
-        reader.onloadend = async () => {
-            // ছবিটিকে স্টোরেজে না পাঠিয়ে সরাসরি টেক্সট হিসেবে ডাটাবেজে সেভ করা হচ্ছে
-            await setDoc(doc(db, "users", auth.currentUser.uid), { 
-                name: name, 
-                url: reader.result // এটিই সেই ছবির ডাটা
-            });
-            alert("প্রোফাইল আপডেট হয়েছে!");
-            location.reload();
-        };
-        reader.readAsDataURL(file);
-    };
-    picker.click();
-};
+
 
     document.getElementById('mediaInput').onchange = async (e) => {
         const file = e.target.files[0];
