@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #0b141a; color: #e9edef; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #0b141a; color: #e9edef; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         .chat-bg { background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-color: rgba(11, 20, 26, 0.95); background-blend-mode: overlay; }
         .my-msg { background-color: #005c4b; border-radius: 10px 0 10px 10px; align-self: flex-end; }
         .friend-msg { background-color: #202c33; border-radius: 0 10px 10px 10px; align-self: flex-start; }
@@ -19,26 +19,24 @@
 
     <div id="auth-page" class="active justify-center items-center p-6">
         <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" class="w-20 mb-8">
-        <h1 class="text-2xl font-bold mb-6">WhatsApp Lite</h1>
-        <input id="email" type="email" placeholder="Email" class="w-full max-w-sm p-3 rounded bg-[#2a3942] mb-3 outline-none border-b-2 border-transparent focus:border-[#00a884]">
-        <input id="pass" type="password" placeholder="Password" class="w-full max-w-sm p-3 rounded bg-[#2a3942] mb-6 outline-none border-b-2 border-transparent focus:border-[#00a884]">
+        <input id="email" type="email" placeholder="ইমেইল দিন" class="w-full max-w-sm p-4 rounded bg-[#2a3942] mb-3 outline-none">
+        <input id="pass" type="password" placeholder="পাসওয়ার্ড দিন" class="w-full max-w-sm p-4 rounded bg-[#2a3942] mb-6 outline-none">
         <div class="flex gap-4">
-            <button onclick="handleAuth('login')" class="bg-[#00a884] px-10 py-2 rounded-full font-bold">Login</button>
-            <button onclick="handleAuth('signup')" class="border border-[#00a884] px-10 py-2 rounded-full font-bold">Sign Up</button>
+            <button onclick="handleAuth('login')" class="bg-[#00a884] px-10 py-3 rounded-full font-bold">লগইন</button>
+            <button onclick="handleAuth('signup')" class="border border-[#00a884] px-10 py-3 rounded-full font-bold">সাইন আপ</button>
         </div>
     </div>
 
     <div id="list-page">
         <header class="bg-[#202c33] p-4 flex justify-between items-center shadow-lg">
             <h1 class="text-xl font-bold text-[#00a884]">WhatsApp</h1>
-            <div class="flex gap-5 text-[#aebac1]">
+            <div class="flex gap-5 text-[#aebac1] text-lg">
+                <i class="fa-solid fa-camera cursor-pointer" onclick="openProfile()"></i>
                 <i class="fa-solid fa-search"></i>
-                <div class="relative">
-                    <i class="fa-solid fa-ellipsis-vertical cursor-pointer p-2" onclick="document.getElementById('menu').classList.toggle('hidden')"></i>
-                    <div id="menu" class="hidden absolute right-0 mt-2 w-40 bg-[#233138] shadow-2xl z-50 rounded py-2">
-                        <div class="px-4 py-2 hover:bg-[#182229] cursor-pointer" onclick="openProfile()">Settings</div>
-                        <div class="px-4 py-2 hover:bg-[#182229] cursor-pointer" onclick="auth.signOut()">Logout</div>
-                    </div>
+                <i class="fa-solid fa-ellipsis-vertical cursor-pointer" onclick="document.getElementById('menu').classList.toggle('hidden')"></i>
+                <div id="menu" class="hidden absolute right-4 top-14 bg-[#233138] py-2 w-40 shadow-2xl z-50 rounded">
+                    <div class="px-4 py-2 hover:bg-[#182229] cursor-pointer" onclick="openProfile()">সেটিংস (নাম/ছবি)</div>
+                    <div class="px-4 py-2 hover:bg-[#182229] cursor-pointer" onclick="auth.signOut()">লগআউট</div>
                 </div>
             </div>
         </header>
@@ -47,17 +45,17 @@
 
     <div id="chat-page">
         <header class="bg-[#202c33] p-3 flex items-center gap-3 shadow-md">
-            <i class="fa-solid fa-arrow-left cursor-pointer" onclick="showPage('list-page')"></i>
+            <i class="fa-solid fa-arrow-left cursor-pointer p-2" onclick="showPage('list-page')"></i>
             <img id="c-pic" src="" class="w-10 h-10 rounded-full object-cover">
             <div class="flex-1">
                 <h2 id="c-name" class="font-bold">Name</h2>
                 <p class="text-[10px] text-[#00a884]">online</p>
             </div>
-            <i class="fa-solid fa-ban text-red-500 cursor-pointer" onclick="blockUser()"></i>
         </header>
         <div id="msg-box" class="flex-1 overflow-y-auto p-4 chat-bg flex flex-col gap-2"></div>
         <footer class="bg-[#202c33] p-3 flex items-center gap-2">
-            <input id="m-input" type="text" placeholder="Type a message" class="flex-1 bg-[#2a3942] p-2 rounded-full px-4 outline-none">
+            <i class="fa-solid fa-plus text-[#8696a0] text-xl cursor-pointer" onclick="document.getElementById('media-input').click()"></i>
+            <input id="m-input" type="text" placeholder="মেসেজ লিখুন" class="flex-1 bg-[#2a3942] p-2 rounded-full px-4 outline-none">
             <button onclick="sendMsg()" class="bg-[#00a884] w-12 h-12 rounded-full flex items-center justify-center">
                 <i class="fa-solid fa-paper-plane text-white"></i>
             </button>
@@ -65,10 +63,11 @@
     </div>
 
     <input type="file" id="p-input" class="hidden" accept="image/*">
+    <input type="file" id="media-input" class="hidden" accept="image/*,video/*">
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, getDoc, setDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -81,7 +80,6 @@
   appId: "1:714987169605:web:26bf3586f9da2b6d52402c",
   measurementId: "G-HXW1L660ZF"
 };
-
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
@@ -90,7 +88,7 @@
         window.handleAuth = (t) => {
             const e = document.getElementById('email').value, p = document.getElementById('pass').value;
             if(t==='login') signInWithEmailAndPassword(auth,e,p).catch(err=>alert(err.message));
-            else createUserWithEmailAndPassword(auth,e,p).then(res=>setDoc(doc(db,"users",res.user.uid),{name:"User",blocked:[]})).catch(err=>alert(err.message));
+            else createUserWithEmailAndPassword(auth,e,p).then(res=>setDoc(doc(db,"users",res.user.uid),{name:"নতুন ইউজার",url:""})).catch(err=>alert(err.message));
         };
 
         onAuthStateChanged(auth, u => {
@@ -103,21 +101,21 @@
             document.getElementById(id).classList.add('active');
         }
 
-        async function loadUsers(){
+        function loadUsers(){
             onSnapshot(collection(db,"users"),(s)=>{
                 const l = document.getElementById('user-list'); l.innerHTML="";
                 s.forEach(d=>{
                     if(d.id!==auth.currentUser.uid){
-                        l.innerHTML += `<div class="flex items-center gap-4 p-4 border-b border-[#233138] cursor-pointer" onclick="openChat('${d.id}','${d.data().name}','${d.data().url||''}')">
+                        l.innerHTML += `<div class="flex items-center gap-4 p-4 border-b border-[#233138] cursor-pointer hover:bg-[#2a3942]" onclick="openChat('${d.id}','${d.data().name}','${d.data().url||''}')">
                             <img src="${d.data().url||'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" class="w-12 h-12 rounded-full object-cover">
-                            <div><p class="font-bold">${d.data().name}</p><p class="text-xs text-gray-500">Tap to chat private</p></div>
+                            <div class="flex-1"><p class="font-bold">${d.data().name}</p><p class="text-xs text-gray-500 italic">ব্যক্তিগত চ্যাট শুরু করুন</p></div>
                         </div>`;
                     }
                 });
             });
         }
 
-        window.openChat = async (uid, n, p) => {
+        window.openChat = (uid, n, p) => {
             activeUid = uid; showPage('chat-page');
             document.getElementById('c-name').innerText = n;
             document.getElementById('c-pic').src = p || 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
@@ -128,38 +126,39 @@
                 s.forEach(m=>{
                     const d = m.data();
                     if((d.f===auth.currentUser.uid && d.t===uid) || (d.f===uid && d.t===auth.currentUser.uid)){
-                        b.innerHTML += `<div class="${d.f===auth.currentUser.uid?'my-msg':'friend-msg'} p-2 px-3 max-w-[80%] shadow-sm text-sm">${d.msg}</div>`;
+                        let content = d.type === 'image' ? `<img src="${d.msg}" class="rounded-lg max-w-full">` : d.type === 'video' ? `<video src="${d.msg}" controls class="rounded-lg"></video>` : `<p>${d.msg}</p>`;
+                        b.innerHTML += `<div class="${d.f===auth.currentUser.uid?'my-msg':'friend-msg'} p-2 px-3 max-w-[85%] shadow-md text-sm">${content}</div>`;
                     }
                 });
                 b.scrollTop = b.scrollHeight;
             });
         };
 
-        window.sendMsg = async () => {
-            const i = document.getElementById('m-input'); if(!i.value) return;
-            // ব্লক চেক লজিক
-            const s = await getDoc(doc(db,"users",activeUid));
-            if(s.data().blocked && s.data().blocked.includes(auth.currentUser.uid)) return alert("You are blocked!");
-            await addDoc(collection(db,"messages"),{msg:i.value, f:auth.currentUser.uid, t:activeUid, time:Date.now()});
-            i.value="";
+        window.sendMsg = async (type='text', data=null) => {
+            const input = document.getElementById('m-input');
+            const msg = data || input.value;
+            if(!msg) return;
+            await addDoc(collection(db,"messages"),{msg, f:auth.currentUser.uid, t:activeUid, time:Date.now(), type});
+            input.value="";
+        };
+
+        // মিডিয়া শেয়ারিং লজিক (ছবি/ভিডিও)
+        document.getElementById('media-input').onchange = (e) => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onloadend = () => sendMsg(file.type.startsWith('image') ? 'image' : 'video', reader.result);
+            reader.readAsDataURL(file);
         };
 
         window.openProfile = () => {
-            const n = prompt("Enter Name:"); if(!n) return;
+            const n = prompt("আপনার নাম লিখুন:"); if(!n) return;
             const pi = document.getElementById('p-input');
             pi.onchange = (e) => {
                 const r = new FileReader(); r.onloadend = async () => {
                     await updateDoc(doc(db,"users",auth.currentUser.uid),{name:n, url:r.result});
-                    alert("Updated!");
+                    alert("প্রোফাইল আপডেট হয়েছে!");
                 }; r.readAsDataURL(e.target.files[0]);
             }; pi.click();
-        };
-
-        window.blockUser = async () => {
-            if(confirm("Block this user?")){
-                await updateDoc(doc(db,"users",auth.currentUser.uid),{blocked: arrayUnion(activeUid)});
-                alert("User Blocked!"); showPage('list-page');
-            }
         };
     </script>
 </body>
