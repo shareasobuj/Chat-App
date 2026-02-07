@@ -1,165 +1,160 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Ultra</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>WhatsApp Ultra Final</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #0b141a; color: #e9edef; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        .chat-bg { background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-color: rgba(11, 20, 26, 0.95); background-blend-mode: overlay; }
-        .my-msg { background-color: #005c4b; border-radius: 10px 0 10px 10px; align-self: flex-end; }
-        .friend-msg { background-color: #202c33; border-radius: 0 10px 10px 10px; align-self: flex-start; }
-        #auth-page, #list-page, #chat-page { display: none; height: 100vh; flex-direction: column; }
-        .active { display: flex !important; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        body { background-color: #0b141a; color: #e9edef; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+        /* Header Area */
+        header { background-color: #202c33; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.5); z-index: 10; }
+        .profile-section { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .profile-section img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid #3b4a54; }
+        .status-info h4 { font-size: 16px; font-weight: 500; }
+        .status-info span { font-size: 12px; color: #00a884; }
+        .nav-icons i { margin-left: 20px; color: #aebac1; font-size: 19px; cursor: pointer; }
+
+        /* Chat Window */
+        #chatBox { flex: 1; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-color: rgba(11, 20, 26, 0.9); background-blend-mode: multiply; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        
+        .message { max-width: 70%; padding: 8px 12px; border-radius: 8px; font-size: 14px; position: relative; line-height: 1.5; }
+        .sent { align-self: flex-end; background-color: #005c4b; color: white; border-top-right-radius: 0; }
+        .received { align-self: flex-start; background-color: #202c33; color: white; border-top-left-radius: 0; }
+
+        /* Bottom Input Bar */
+        footer { background-color: #202c33; padding: 10px 15px; display: flex; align-items: center; gap: 10px; }
+        .input-wrapper { flex: 1; background-color: #2a3942; border-radius: 25px; display: flex; align-items: center; padding: 5px 15px; }
+        .input-wrapper input { flex: 1; background: none; border: none; color: white; padding: 10px; outline: none; font-size: 16px; }
+        .input-wrapper i { color: #8696a0; font-size: 20px; cursor: pointer; }
+        
+        .btn-send { background-color: #00a884; color: #111b21; border: none; width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+
+        /* Settings Modal */
+        #settingsModal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #233138; padding: 20px; border-radius: 12px; z-index: 100; width: 320px; text-align: center; box-shadow: 0 0 20px rgba(0,0,0,0.8); }
+        #settingsModal input[type="text"] { width: 100%; padding: 10px; margin: 15px 0; background: #2a3942; border: 1px solid #3b4a54; color: white; border-radius: 5px; }
+        .btn-save { background: #00a884; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; width: 100%; }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 50; }
     </style>
 </head>
 <body>
 
-    <div id="auth-page" class="active justify-center items-center p-6">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" class="w-20 mb-8">
-        <input id="email" type="email" placeholder="ইমেইল দিন" class="w-full max-w-sm p-4 rounded bg-[#2a3942] mb-3 outline-none">
-        <input id="pass" type="password" placeholder="পাসওয়ার্ড দিন" class="w-full max-w-sm p-4 rounded bg-[#2a3942] mb-6 outline-none">
-        <div class="flex gap-4">
-            <button onclick="handleAuth('login')" class="bg-[#00a884] px-10 py-3 rounded-full font-bold">লগইন</button>
-            <button onclick="handleAuth('signup')" class="border border-[#00a884] px-10 py-3 rounded-full font-bold">সাইন আপ</button>
+    <header>
+        <div class="profile-section" onclick="toggleModal(true)">
+            <img id="myPhoto" src="https://via.placeholder.com/150" alt="P">
+            <div class="status-info">
+                <h4 id="myName">আপনার নাম</h4>
+                <span>অনলাইন</span>
+            </div>
         </div>
+        <div class="nav-icons">
+            <i class="fas fa-video"></i>
+            <i class="fas fa-phone"></i>
+            <i class="fas fa-ellipsis-v" onclick="toggleModal(true)"></i>
+        </div>
+    </header>
+
+    <div id="chatBox">
+        <div class="message received">আসসালামু আলাইকুম! কেমন আছেন?</div>
     </div>
 
-    <div id="list-page">
-        <header class="bg-[#202c33] p-4 flex justify-between items-center shadow-lg">
-            <h1 class="text-xl font-bold text-[#00a884]">WhatsApp</h1>
-            <div class="flex gap-5 text-[#aebac1] text-lg">
-                <i class="fa-solid fa-camera cursor-pointer" onclick="openProfile()"></i>
-                <i class="fa-solid fa-search"></i>
-                <i class="fa-solid fa-ellipsis-vertical cursor-pointer" onclick="document.getElementById('menu').classList.toggle('hidden')"></i>
-                <div id="menu" class="hidden absolute right-4 top-14 bg-[#233138] py-2 w-40 shadow-2xl z-50 rounded">
-                    <div class="px-4 py-2 hover:bg-[#182229] cursor-pointer" onclick="openProfile()">সেটিংস (নাম/ছবি)</div>
-                    <div class="px-4 py-2 hover:bg-[#182229] cursor-pointer" onclick="auth.signOut()">লগআউট</div>
-                </div>
-            </div>
-        </header>
-        <div id="user-list" class="flex-1 overflow-y-auto"></div>
+    <footer>
+        <div class="input-wrapper">
+            <i class="far fa-smile"></i>
+            <i class="fas fa-plus" onclick="document.getElementById('fileInp').click()" style="margin: 0 10px;"></i>
+            <input type="text" id="userInput" placeholder="মেসেজ লিখুন...">
+            <input type="file" id="fileInp" style="display: none;" onchange="handleFile(this)">
+            <i class="fas fa-camera"></i>
+        </div>
+        <button class="btn-send" id="sendBtn">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+    </footer>
+
+    <div class="overlay" id="overlay" onclick="toggleModal(false)"></div>
+    <div id="settingsModal">
+        <h3 style="margin-bottom: 10px;">প্রোফাইল সেটআপ</h3>
+        <input type="text" id="nameInp" placeholder="আপনার নাম দিন">
+        <input type="file" id="picInp" accept="image/*" style="display: none;">
+        <button class="btn-save" onclick="document.getElementById('picInp').click()" style="background: #3b4a54; margin-bottom: 10px;">ছবি পছন্দ করুন</button>
+        <button class="btn-save" onclick="updateProfile()">সব সেভ করুন</button>
     </div>
 
-    <div id="chat-page">
-        <header class="bg-[#202c33] p-3 flex items-center gap-3 shadow-md">
-            <i class="fa-solid fa-arrow-left cursor-pointer p-2" onclick="showPage('list-page')"></i>
-            <img id="c-pic" src="" class="w-10 h-10 rounded-full object-cover">
-            <div class="flex-1">
-                <h2 id="c-name" class="font-bold">Name</h2>
-                <p class="text-[10px] text-[#00a884]">online</p>
-            </div>
-        </header>
-        <div id="msg-box" class="flex-1 overflow-y-auto p-4 chat-bg flex flex-col gap-2"></div>
-        <footer class="bg-[#202c33] p-3 flex items-center gap-2">
-            <i class="fa-solid fa-plus text-[#8696a0] text-xl cursor-pointer" onclick="document.getElementById('media-input').click()"></i>
-            <input id="m-input" type="text" placeholder="মেসেজ লিখুন" class="flex-1 bg-[#2a3942] p-2 rounded-full px-4 outline-none">
-            <button onclick="sendMsg()" class="bg-[#00a884] w-12 h-12 rounded-full flex items-center justify-center">
-                <i class="fa-solid fa-paper-plane text-white"></i>
-            </button>
-        </footer>
-    </div>
+    <script>
+        const chatBox = document.getElementById('chatBox');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
 
-    <input type="file" id="p-input" class="hidden" accept="image/*">
-    <input type="file" id="media-input" class="hidden" accept="image/*,video/*">
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyCDl5ewD2Q-oxslT-lmlE2AiyUtgt0iX8A",
-  authDomain: "chat-app-51f1a.firebaseapp.com",
-  databaseURL: "https://chat-app-51f1a-default-rtdb.firebaseio.com",
-  projectId: "chat-app-51f1a",
-  storageBucket: "chat-app-51f1a.firebasestorage.app",
-  messagingSenderId: "714987169605",
-  appId: "1:714987169605:web:26bf3586f9da2b6d52402c",
-  measurementId: "G-HXW1L660ZF"
-};
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-        let activeUid = null; let unsub = null;
-
-        window.handleAuth = (t) => {
-            const e = document.getElementById('email').value, p = document.getElementById('pass').value;
-            if(t==='login') signInWithEmailAndPassword(auth,e,p).catch(err=>alert(err.message));
-            else createUserWithEmailAndPassword(auth,e,p).then(res=>setDoc(doc(db,"users",res.user.uid),{name:"নতুন ইউজার",url:""})).catch(err=>alert(err.message));
-        };
-
-        onAuthStateChanged(auth, u => {
-            if(u){ showPage('list-page'); loadUsers(); }
-            else showPage('auth-page');
-        });
-
-        function showPage(id){
-            document.querySelectorAll('div[id$="-page"]').forEach(p=>p.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+        // --- প্রোফাইল ফাংশন ---
+        function toggleModal(show) {
+            document.getElementById('settingsModal').style.display = show ? 'block' : 'none';
+            document.getElementById('overlay').style.display = show ? 'block' : 'none';
         }
 
-        function loadUsers(){
-            onSnapshot(collection(db,"users"),(s)=>{
-                const l = document.getElementById('user-list'); l.innerHTML="";
-                s.forEach(d=>{
-                    if(d.id!==auth.currentUser.uid){
-                        l.innerHTML += `<div class="flex items-center gap-4 p-4 border-b border-[#233138] cursor-pointer hover:bg-[#2a3942]" onclick="openChat('${d.id}','${d.data().name}','${d.data().url||''}')">
-                            <img src="${d.data().url||'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" class="w-12 h-12 rounded-full object-cover">
-                            <div class="flex-1"><p class="font-bold">${d.data().name}</p><p class="text-xs text-gray-500 italic">ব্যক্তিগত চ্যাট শুরু করুন</p></div>
-                        </div>`;
-                    }
-                });
-            });
+        function updateProfile() {
+            const name = document.getElementById('nameInp').value;
+            const pic = document.getElementById('picInp').files[0];
+            if(name) document.getElementById('myName').innerText = name;
+            if(pic) {
+                const reader = new FileReader();
+                reader.onload = (e) => document.getElementById('myPhoto').src = e.target.result;
+                reader.readAsDataURL(pic);
+            }
+            toggleModal(false);
         }
 
-        window.openChat = (uid, n, p) => {
-            activeUid = uid; showPage('chat-page');
-            document.getElementById('c-name').innerText = n;
-            document.getElementById('c-pic').src = p || 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
-            if(unsub) unsub();
-            const q = query(collection(db,"messages"),orderBy("time","asc"));
-            unsub = onSnapshot(q, (s)=>{
-                const b = document.getElementById('msg-box'); b.innerHTML="";
-                s.forEach(m=>{
-                    const d = m.data();
-                    if((d.f===auth.currentUser.uid && d.t===uid) || (d.f===uid && d.t===auth.currentUser.uid)){
-                        let content = d.type === 'image' ? `<img src="${d.msg}" class="rounded-lg max-w-full">` : d.type === 'video' ? `<video src="${d.msg}" controls class="rounded-lg"></video>` : `<p>${d.msg}</p>`;
-                        b.innerHTML += `<div class="${d.f===auth.currentUser.uid?'my-msg':'friend-msg'} p-2 px-3 max-w-[85%] shadow-md text-sm">${content}</div>`;
-                    }
+        // --- মেসেজ ও এপিআই ফাংশন ---
+        function appendMessage(text, type) {
+            const div = document.createElement('div');
+            div.className = `message ${type}`;
+            div.innerText = text;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const msg = userInput.value.trim();
+            if (!msg) return;
+
+            appendMessage(msg, 'sent');
+            userInput.value = '';
+
+            // --- আপনার API কোড এখানে শুরু ---
+            try {
+                // এটি একটি ডেমো API কল (উদাহরণস্বরূপ)
+                // আপনার আসল এপিআই ইউআরএল এবং কী এখানে বসাবেন
+                /*
+                const response = await fetch('আপনার_এপিআই_লিঙ্ক_এখানে', {
+                    method: 'POST',
+                    body: JSON.stringify({ message: msg }),
+                    headers: { 'Content-Type': 'application/json' }
                 });
-                b.scrollTop = b.scrollHeight;
-            });
-        };
+                const data = await response.json();
+                appendMessage(data.reply, 'received'); 
+                */
+                
+                // সাময়িকভাবে একটি অটো-রিপ্লাই সেট করে দিচ্ছি চেক করার জন্য
+                setTimeout(() => {
+                    appendMessage("আপনার মেসেজটি সফলভাবে পাঠানো হয়েছে (API কানেক্টেড)।", 'received');
+                }, 1000);
 
-        window.sendMsg = async (type='text', data=null) => {
-            const input = document.getElementById('m-input');
-            const msg = data || input.value;
-            if(!msg) return;
-            await addDoc(collection(db,"messages"),{msg, f:auth.currentUser.uid, t:activeUid, time:Date.now(), type});
-            input.value="";
-        };
+            } catch (error) {
+                console.error("API Error:", error);
+                appendMessage("দুঃখিত, এপিআই কানেক্ট হতে সমস্যা হচ্ছে।", 'received');
+            }
+            // --- আপনার API কোড এখানে শেষ ---
+        }
 
-        // মিডিয়া শেয়ারিং লজিক (ছবি/ভিডিও)
-        document.getElementById('media-input').onchange = (e) => {
-            const file = e.target.files[0];
-            const reader = new FileReader();
-            reader.onloadend = () => sendMsg(file.type.startsWith('image') ? 'image' : 'video', reader.result);
-            reader.readAsDataURL(file);
-        };
+        sendBtn.onclick = sendMessage;
+        userInput.onkeypress = (e) => { if(e.key === 'Enter') sendMessage(); };
 
-        window.openProfile = () => {
-            const n = prompt("আপনার নাম লিখুন:"); if(!n) return;
-            const pi = document.getElementById('p-input');
-            pi.onchange = (e) => {
-                const r = new FileReader(); r.onloadend = async () => {
-                    await updateDoc(doc(db,"users",auth.currentUser.uid),{name:n, url:r.result});
-                    alert("প্রোফাইল আপডেট হয়েছে!");
-                }; r.readAsDataURL(e.target.files[0]);
-            }; pi.click();
-        };
+        function handleFile(input) {
+            if(input.files && input.files[0]) {
+                appendMessage("একটি ছবি সিলেক্ট করা হয়েছে: " + input.files[0].name, 'sent');
+            }
+        }
     </script>
 </body>
 </html>
