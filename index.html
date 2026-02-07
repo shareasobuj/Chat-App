@@ -1,74 +1,155 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Ultra Final</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>WhatsApp Clone Pro</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #0b141a; color: #e9edef; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        .chat-bg { background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-color: rgba(11, 20, 26, 0.95); background-blend-mode: overlay; }
-        .my-msg { background-color: #005c4b; border-radius: 10px 0 10px 10px; align-self: flex-end; padding: 10px; margin: 4px; }
-        .friend-msg { background-color: #202c33; border-radius: 0 10px 10px 10px; align-self: flex-start; padding: 10px; margin: 4px; }
-        #auth-page, #list-page, #chat-page { display: none; height: 100vh; flex-direction: column; }
-        .active { display: flex !important; }
+        :root {
+            --wa-green: #00a884;
+            --wa-bg: #f0f2f5;
+            --wa-sidebar: #ffffff;
+            --wa-chat-bg: #efeae2;
+            --wa-sent: #d9fdd3;
+            --wa-received: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; }
+        body { background-color: #d1d7db; height: 100vh; display: flex; justify-content: center; align-items: center; }
+
+        .app-wrapper {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            max-width: 1600px;
+            background: #fff;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar { width: 30%; min-width: 300px; border-right: 1px solid #ddd; display: flex; flex-direction: column; }
+        .side-header { height: 60px; background: #f0f2f5; display: flex; align-items: center; padding: 0 16px; justify-content: space-between; }
+        .profile-pic { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+        
+        .search-container { padding: 8px 12px; background: #fff; border-bottom: 1px solid #f6f6f6; }
+        .search-bar { background: #f0f2f5; display: flex; align-items: center; padding: 5px 15px; border-radius: 8px; }
+        .search-bar input { border: none; background: transparent; padding: 6px; outline: none; width: 100%; font-size: 14px; }
+
+        .chat-list { flex: 1; overflow-y: auto; background: #fff; }
+        .contact { display: flex; padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #f2f2f2; align-items: center; transition: 0.2s; }
+        .contact:hover { background: #f5f6f6; }
+        .contact-info { margin-left: 15px; flex: 1; }
+        .contact-info h4 { font-size: 16px; color: #111; font-weight: 500; }
+        .contact-info p { font-size: 13px; color: #667781; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        /* Main Chat Area */
+        .main-chat { flex: 1; display: flex; flex-direction: column; background: var(--wa-chat-bg); position: relative; }
+        .chat-header { height: 60px; background: #f0f2f5; display: flex; align-items: center; padding: 0 16px; border-left: 1px solid #ddd; }
+        
+        .messages { 
+            flex: 1; 
+            padding: 20px 7%; 
+            overflow-y: auto; 
+            display: flex; 
+            flex-direction: column; 
+            background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+            background-blend-mode: overlay;
+        }
+
+        .bubble { 
+            max-width: 65%; 
+            padding: 8px 12px; 
+            border-radius: 8px; 
+            margin-bottom: 4px; 
+            font-size: 14.5px; 
+            position: relative; 
+            box-shadow: 0 1px 0.5px rgba(0,0,0,0.1);
+        }
+        .sent { align-self: flex-end; background: var(--wa-sent); border-top-right-radius: 0; }
+        .received { align-self: flex-start; background: var(--wa-received); border-top-left-radius: 0; }
+        .timestamp { font-size: 10px; color: #667781; margin-left: 8px; float: right; margin-top: 5px; }
+
+        /* Input Section */
+        .input-box { height: 62px; background: #f0f2f5; display: flex; align-items: center; padding: 0 16px; gap: 15px; }
+        .input-box i { color: #54656f; font-size: 20px; cursor: pointer; }
+        .input-box input { flex: 1; border: none; padding: 10px 15px; border-radius: 8px; outline: none; font-size: 15px; }
+        .btn-send { color: #54656f; font-size: 22px; cursor: pointer; border: none; background: none; }
+
     </style>
 </head>
 <body>
 
-    <div id="auth-page" class="active justify-center items-center p-6 text-center">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" class="w-20 mb-8 mx-auto">
-        <input id="email" type="email" placeholder="Email" class="w-full max-w-sm p-4 rounded bg-[#2a3942] mb-3 outline-none ring-1 ring-gray-600 focus:ring-[#00a884]">
-        <input id="pass" type="password" placeholder="Password" class="w-full max-w-sm p-4 rounded bg-[#2a3942] mb-6 outline-none ring-1 ring-gray-600 focus:ring-[#00a884]">
-        <div class="flex gap-4 justify-center">
-            <button onclick="handleAuth('login')" class="bg-[#00a884] px-10 py-3 rounded-full font-bold shadow-lg">Login</button>
-            <button onclick="handleAuth('signup')" class="border border-[#00a884] px-10 py-3 rounded-full font-bold">Sign Up</button>
+<div class="app-wrapper">
+    <div class="sidebar">
+        <div class="side-header">
+            <img src="https://i.pravatar.cc/100?u=myaccount" class="profile-pic" alt="Me">
+            <div>
+                <i class="fas fa-circle-notch" style="margin-right: 15px; color: #54656f;"></i>
+                <i class="fas fa-comment-alt" style="margin-right: 15px; color: #54656f;"></i>
+                <i class="fas fa-ellipsis-v" style="color: #54656f;"></i>
+            </div>
+        </div>
+        <div class="search-container">
+            <div class="search-bar">
+                <i class="fas fa-search" style="color: #54656f; font-size: 13px;"></i>
+                <input type="text" placeholder="Search or start new chat">
+            </div>
+        </div>
+        <div class="chat-list" id="chatList">
+            <div class="contact" onclick="selectChat('সাকিব', 'https://i.pravatar.cc/100?u=1')">
+                <img src="https://i.pravatar.cc/100?u=1" class="profile-pic">
+                <div class="contact-info">
+                    <h4>সাকিব</h4>
+                    <p>কিরে দোস্ত, ফ্রিল্যান্সিং এর খবর কি?</p>
+                </div>
+            </div>
+            <div class="contact" onclick="selectChat('তানভীর ভাই', 'https://i.pravatar.cc/100?u=2')">
+                <img src="https://i.pravatar.cc/100?u=2" class="profile-pic">
+                <div class="contact-info">
+                    <h4>তানভীর ভাই</h4>
+                    <p>কাল মিটিং আছে কিন্তু!</p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div id="list-page">
-        <header class="bg-[#202c33] p-4 flex justify-between items-center shadow-md">
-            <h1 class="text-xl font-bold text-[#00a884]">WhatsApp</h1>
-            <div class="flex gap-4 text-[#aebac1] text-lg">
-                <i class="fa-solid fa-camera cursor-pointer" onclick="openProfile()"></i>
-                <i class="fa-solid fa-ellipsis-vertical cursor-pointer" onclick="document.getElementById('menu').classList.toggle('hidden')"></i>
-                <div id="menu" class="hidden absolute right-4 top-14 bg-[#233138] w-48 shadow-2xl z-50 rounded py-2">
-                    <div class="px-4 py-2 hover:bg-[#182229] cursor-pointer" onclick="openProfile()">Settings (Name/Pic)</div>
-                    <div class="px-4 py-2 hover:bg-[#182229] cursor-pointer" onclick="auth.signOut()">Logout</div>
-                </div>
+    <div class="main-chat" id="mainChat">
+        <div class="chat-header">
+            <img src="https://i.pravatar.cc/100?u=1" class="profile-pic" id="chatAvatar">
+            <div class="contact-info">
+                <h4 id="currentChatName">সাকিব</h4>
+                <p style="font-size: 12px; color: #667781;">Online</p>
             </div>
-        </header>
-        <div id="user-list" class="flex-1 overflow-y-auto"></div>
+            <div>
+                <i class="fas fa-search" style="margin-right: 20px; color: #54656f;"></i>
+                <i class="fas fa-ellipsis-v" style="color: #54656f;"></i>
+            </div>
+        </div>
+
+        <div class="messages" id="messageArea">
+            <div class="bubble received">আসসালামু আলাইকুম। <span class="timestamp">10:15 AM</span></div>
+            <div class="bubble sent">ওয়ালাইকুম আসসালাম। <span class="timestamp">10:16 AM</span></div>
+        </div>
+
+        <div class="input-box">
+            <i class="far fa-smile"></i>
+            <i class="fas fa-paperclip"></i>
+            <input type="text" id="msgInput" placeholder="Type a message">
+            <button class="btn-send" onclick="handleSend()"><i class="fas fa-paper-plane" id="sendIcon"></i></button>
+        </div>
     </div>
+</div>
 
-    <div id="chat-page">
-        <header class="bg-[#202c33] p-3 flex items-center gap-3 shadow-md">
-            <i class="fa-solid fa-arrow-left cursor-pointer p-2" onclick="showPage('list-page')"></i>
-            <img id="c-pic" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="w-10 h-10 rounded-full object-cover">
-            <h2 id="c-name" class="font-bold flex-1">User</h2>
-        </header>
-        <div id="msg-box" class="flex-1 overflow-y-auto p-4 chat-bg flex flex-col"></div>
-        <footer class="bg-[#202c33] p-3 flex items-center gap-2">
-            <i class="fa-solid fa-plus text-[#8696a0] text-xl cursor-pointer p-2" onclick="document.getElementById('media-input').click()"></i>
-            <input id="m-input" type="text" placeholder="Type a message..." class="flex-1 bg-[#2a3942] p-3 rounded-full px-5 outline-none text-white">
-            <button onclick="sendMsg()" class="bg-[#00a884] w-12 h-12 rounded-full flex items-center justify-center">
-                <i class="fa-solid fa-paper-plane text-white"></i>
-            </button>
-        </footer>
-    </div>
+<script type="module">
+  // FIREBASE CONFIG HERE: আপনার Firebase কনফিগ এখানে বসান
+  /*
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-    <input type="file" id="p-input" class="hidden" accept="image/*">
-    <input type="file" id="media-input" class="hidden" accept="image/*,video/*">
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-        // 🔥 আপনার API এখানে সেট করা হয়েছে
-        const firebaseConfig = {
-            apiKey: "AIzaSyCDl5ewD2Q-oxslT-lmlE2AiyUtgt0iX8A",
+  const firebaseConfig = {
+    apiKey: "AIzaSyCDl5ewD2Q-oxslT-lmlE2AiyUtgt0iX8A",
   authDomain: "chat-app-51f1a.firebaseapp.com",
   databaseURL: "https://chat-app-51f1a-default-rtdb.firebaseio.com",
   projectId: "chat-app-51f1a",
@@ -77,82 +158,44 @@
   appId: "1:714987169605:web:26bf3586f9da2b6d52402c",
   measurementId: "G-HXW1L660ZF"
 };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-        let activeUid = null; let unsub = null;
 
-        window.handleAuth = (t) => {
-            const e = document.getElementById('email').value, p = document.getElementById('pass').value;
-            if(t==='login') signInWithEmailAndPassword(auth,e,p).catch(err=>alert(err.message));
-            else createUserWithEmailAndPassword(auth,e,p).then(res=>setDoc(doc(db,"users",res.user.uid),{name:e.split('@')[0],url:""})).catch(err=>alert(err.message));
-        };
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  */
 
-        onAuthStateChanged(auth, u => {
-            if(u){ showPage('list-page'); loadUsers(); }
-            else showPage('auth-page');
-        });
+  // চ্যাট কন্ট্রোল করার জাভাস্ক্রিপ্ট
+  const msgInput = document.getElementById('msgInput');
+  const msgArea = document.getElementById('messageArea');
 
-        function showPage(id){
-            document.querySelectorAll('div[id$="-page"]').forEach(p=>p.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-        }
+  window.handleSend = function() {
+      const text = msgInput.value.trim();
+      if(text !== "") {
+          renderMessage(text, 'sent');
+          msgInput.value = "";
+          
+          // এখানে ফায়ারবেজে ডাটা পাঠানোর কোড লিখবেন:
+          // push(ref(db, 'messages/'), { text: text, type: 'sent', time: new Date().toLocaleTimeString() });
+      }
+  }
 
-        function loadUsers(){
-            onSnapshot(collection(db,"users"),(s)=>{
-                const l = document.getElementById('user-list'); l.innerHTML="";
-                s.forEach(d=>{
-                    if(d.id!==auth.currentUser.uid){
-                        l.innerHTML += `<div class="flex items-center gap-4 p-4 border-b border-[#233138] cursor-pointer hover:bg-[#2a3942]" onclick="openChat('${d.id}','${d.data().name}','${d.data().url||''}')">
-                            <img src="${d.data().url||'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" class="w-14 h-14 rounded-full object-cover">
-                            <div class="flex-1"><p class="font-bold text-lg">${d.data().name}</p><p class="text-sm text-gray-400">ব্যক্তিগত চ্যাট করুন</p></div>
-                        </div>`;
-                    }
-                });
-            });
-        }
+  function renderMessage(text, type) {
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const msgDiv = document.createElement('div');
+      msgDiv.classList.add('bubble', type);
+      msgDiv.innerHTML = `${text} <span class="timestamp">${time}</span>`;
+      msgArea.appendChild(msgDiv);
+      msgArea.scrollTop = msgArea.scrollHeight;
+  }
 
-        window.openChat = (uid, n, p) => {
-            activeUid = uid; showPage('chat-page');
-            document.getElementById('c-name').innerText = n;
-            document.getElementById('c-pic').src = p || 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
-            if(unsub) unsub();
-            const q = query(collection(db,"messages"),orderBy("time","asc"));
-            unsub = onSnapshot(q, (s)=>{
-                const b = document.getElementById('msg-box'); b.innerHTML="";
-                s.forEach(m=>{
-                    const d = m.data();
-                    if((d.f===auth.currentUser.uid && d.t===uid) || (d.f===uid && d.t===auth.currentUser.uid)){
-                        let content = d.type==='image' ? `<img src="${d.msg}" class="rounded-lg max-w-full">` : `<p>${d.msg}</p>`;
-                        b.innerHTML += `<div class="${d.f===auth.currentUser.uid?'my-msg':'friend-msg'} max-w-[80%] shadow-md">${content}</div>`;
-                    }
-                });
-                b.scrollTop = b.scrollHeight;
-            });
-        };
+  window.selectChat = function(name, img) {
+      document.getElementById('currentChatName').innerText = name;
+      document.getElementById('chatAvatar').src = img;
+      msgArea.innerHTML = `<div style="text-align:center; color:#667781; font-size:12px; margin:20px 0;">মেসেজগুলো এন্ড-টু-এন্ড এনক্রিপ্ট করা</div>`;
+  }
 
-        window.sendMsg = async (type='text', data=null) => {
-            const i = document.getElementById('m-input'); const msg = data || i.value;
-            if(!msg) return;
-            await addDoc(collection(db,"messages"),{msg, f:auth.currentUser.uid, t:activeUid, time:Date.now(), type});
-            i.value="";
-        };
+  msgInput.addEventListener("keypress", (e) => { if(e.key === "Enter") handleSend(); });
 
-        document.getElementById('media-input').onchange = (e) => {
-            const r = new FileReader(); r.onloadend = () => sendMsg('image', r.result);
-            r.readAsDataURL(e.target.files[0]);
-        };
+</script>
 
-        window.openProfile = () => {
-            const n = prompt("আপনার নাম:");
-            const pi = document.getElementById('p-input');
-            pi.onchange = (e) => {
-                const r = new FileReader(); r.onloadend = async () => {
-                    await updateDoc(doc(db,"users",auth.currentUser.uid),{name:n||"User", url:r.result});
-                    alert("Updated!");
-                }; r.readAsAsDataURL(e.target.files[0]);
-            }; pi.click();
-        };
-    </script>
 </body>
-        </html>
+    </html>
